@@ -5,10 +5,9 @@ RUN apt-get update \
     && docker-php-ext-install -j"$(nproc)" curl mbstring pdo_mysql \
     && rm -rf /var/lib/apt/lists/*
 
-RUN for module in mpm_event mpm_worker mpm_prefork; do \
-        a2dismod "$module" 2>/dev/null || true; \
-    done \
-    && a2enmod mpm_prefork rewrite
+RUN rm -f /etc/apache2/mods-enabled/mpm_*.load /etc/apache2/mods-enabled/mpm_*.conf \
+    && a2enmod mpm_prefork rewrite \
+    && test "$(find /etc/apache2/mods-enabled -maxdepth 1 -name 'mpm_*.load' | wc -l)" -eq 1
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
