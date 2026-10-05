@@ -3,8 +3,12 @@ FROM php:8.2-apache
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libcurl4-openssl-dev libonig-dev unzip \
     && docker-php-ext-install -j"$(nproc)" curl mbstring pdo_mysql \
-    && a2enmod rewrite \
     && rm -rf /var/lib/apt/lists/*
+
+RUN for module in mpm_event mpm_worker mpm_prefork; do \
+        a2dismod "$module" 2>/dev/null || true; \
+    done \
+    && a2enmod mpm_prefork rewrite
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
