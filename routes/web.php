@@ -3,6 +3,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MrmsController;
 use App\Http\Controllers\OfficeController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
+
+if (config('app.env') === 'production') {
+    URL::forceScheme('https');
+}
 
 Route::redirect('/', '/login');
 Route::get('/login',[AuthController::class,'form'])->name('login');
